@@ -97,6 +97,49 @@
         <div id="age-chart" class="age-chart"></div> 
       </div> 
 
+      <!-- ════════════════════════════════
+         TAB: PATIENTS LIST
+    ════════════════════════════════ -->
+    <section id="tab-patients" class="tab-content">
+      <div class="page-title">
+        <h1>Lista de Pacientes</h1>
+        <div class="list-controls">
+          <input type="search" id="search-input" class="search-input" placeholder="Buscar por nombre, ID o diagnóstico…"/>
+          <select id="filter-status" class="filter-select">
+            <option value="">Todos los estados</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="crítico">Crítico</option>
+          </select>
+        </div>
+      </div>
+ 
+      <div id="patients-table-wrap" class="table-wrap">
+        <table class="patients-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Edad</th>
+              <th>Género</th>
+              <th>Diagnóstico</th>
+              <th>Estado</th>
+              <th>Fecha Reg.</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="patients-tbody">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+        <div id="empty-state" class="empty-state hidden">
+          <span>🗂</span>
+          <p>No hay pacientes registrados aún.</p>
+          <button class="btn btn-primary" data-tab="register">Registrar primer paciente</button>
+        </div>
+      </div>
+    </section>
+
   </main>
  
   <script src="app.js"></script>
