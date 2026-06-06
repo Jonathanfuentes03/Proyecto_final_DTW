@@ -70,7 +70,32 @@
       </div>
     </section>
 
+     <!-- Worker Status + Location --> 
+      <div class="dash-row"> 
+        <div class="dash-card dash-worker"> 
+          <h3>🔧 Web Worker — Estado de Procesamiento</h3> 
+          <div id="worker-log" class="worker-log"> 
+            <span class="worker-idle">En espera de datos…</span> 
+          </div> 
+          <button class="btn btn-secondary btn-sm" id="btn-recalc">Recalcular métricas</button> 
+        </div> 
 
+  
+
+        <div class="dash-card dash-location"> 
+          <h3>📍 Geolocalización del Dispositivo</h3> 
+          <div id="geo-info" class="geo-box"> 
+            <button class="btn btn-secondary" id="btn-geo">Obtener ubicación</button> 
+          </div> 
+          <div id="weather-info" class="weather-box hidden"></div> 
+        </div> 
+      </div> 
+
+      <!-- Age Distribution --> 
+      <div class="dash-card"> 
+        <h3>📊 Distribución por Rango de Edad</h3> 
+        <div id="age-chart" class="age-chart"></div> 
+      </div> 
 
   </main>
  
