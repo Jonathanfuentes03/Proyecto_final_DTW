@@ -1,10 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+
+<meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sistema de Pacientes</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚕</span>
+        <span class="logo-text">SISMEDI-<strong>Sistema de registros medicos</strong></span>
+      </div>
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="patients">Pacientes</button>
+        <button class="nav-btn" data-tab="register">Nuevo Registro</button>
+      </nav>
+      <div class="header-meta">
+        <span id="session-info" class="session-badge"></span>
+      </div>
+    </div>
+
 </head>
 <body>
  
