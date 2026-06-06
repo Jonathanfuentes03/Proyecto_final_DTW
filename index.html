@@ -31,6 +31,47 @@
  
   <main class="main">
  
+    <!-- ════════════════════════════════
+         TAB: DASHBOARD
+    ════════════════════════════════ -->
+    <section id="tab-dashboard" class="tab-content active">
+      <div class="page-title">
+        <h1>Panel de Control</h1>
+        <p class="subtitle">Métricas calculadas en tiempo real con Web Worker</p>
+      </div>
+ 
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-total">
+          <div class="kpi-label">Total Pacientes</div>
+          <div class="kpi-value" id="kpi-total">—</div>
+          <div class="kpi-sub">registros activos</div>
+        </div>
+        <div class="kpi-card kpi-active">
+          <div class="kpi-label">Activos</div>
+          <div class="kpi-value" id="kpi-active">—</div>
+          <div class="kpi-bar"><div id="bar-active" class="bar-fill bar-green"></div></div>
+        </div>
+        <div class="kpi-card kpi-inactive">
+          <div class="kpi-label">Inactivos</div>
+          <div class="kpi-value" id="kpi-inactive">—</div>
+          <div class="kpi-bar"><div id="bar-inactive" class="bar-fill bar-amber"></div></div>
+        </div>
+        <div class="kpi-card kpi-critical">
+          <div class="kpi-label">Críticos</div>
+          <div class="kpi-value" id="kpi-critical">—</div>
+          <div class="kpi-bar"><div id="bar-critical" class="bar-fill bar-red"></div></div>
+        </div>
+        <div class="kpi-card kpi-avg">
+          <div class="kpi-label">Edad Promedio</div>
+          <div class="kpi-value" id="kpi-avg-age">—</div>
+          <div class="kpi-sub">años</div>
+        </div>
+      </div>
+    </section>
+
+
+
   </main>
  
   <script src="app.js"></script>
