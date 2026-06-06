@@ -35,3 +35,49 @@ body {
   font-size: 15px;
   line-height: 1.6;
 }
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-deep);
+  height: var(--header-h);
+  border-bottom: 3px solid var(--accent-light);
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  height: 100%; padding: 0 24px;
+  display: flex; align-items: center; gap: 32px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  color: #fff; font-family: var(--font-body); font-size: 18px;
+  white-space: nowrap;
+}
+.logo-icon { font-size: 24px; }
+.logo strong { font-weight: 600; color: var(--accent-light); }
+ 
+.nav-tabs { display: flex; gap: 4px; flex: 1; }
+.nav-btn {
+  background: transparent; border: none; cursor: pointer;
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  padding: 8px 18px; border-radius: 6px;
+  transition: background .2s, color .2s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.nav-btn.active { background: var(--accent); color: #fff; }
+ 
+.fields-notice {
+  font-size: 12px;                          /* ← letra pequeña        */
+  color: var(--text-muted);                 /* ← color gris           */
+  background: #f0f4f0;                      /* ← fondo verde muy claro*/
+  border-left: 3px solid var(--accent-light);/* ← línea verde izquierda*/
+  border-radius: 0 6px 6px 0;              /* ← esquinas redondeadas  */
+  padding: 9px 14px;                        /* ← espacio interno       */
+  margin: 4px 0;                            /* ← separación vertical   */
+}
+ 
+.session-badge {
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
