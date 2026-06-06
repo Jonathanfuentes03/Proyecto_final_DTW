@@ -1,0 +1,37 @@
+/* ═══════════════════════════════════════════════
+   MedRegister — Estilos
+   Estética: Editorial médica • Crema + Verde oscuro + Acento índigo
+═══════════════════════════════════════════════ */
+ 
+:root {
+  --bg:          #f5f2ec;
+  --bg-card:     #fdfbf7;
+  --bg-deep:     #1a2e25;
+  --text:        #1a2e25;
+  --text-muted:  #6b7a72;
+  --accent:      #2d6a4f;
+  --accent-light:#52b788;
+  --accent-alt:  #3a5a8a;
+  --danger:      #c0392b;
+  --amber:       #d4831a;
+  --border:      #d8d4cb;
+  --shadow:      0 2px 16px rgba(26,46,37,0.09);
+  --radius:      12px;
+  --radius-sm:   8px;
+  --font-display:"DM Serif Display", Georgia, serif;
+  --font-body:   "DM Sans", sans-serif;
+  --header-h:    64px;
+}
+ 
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+html { scroll-behavior: smooth; }
+ 
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
