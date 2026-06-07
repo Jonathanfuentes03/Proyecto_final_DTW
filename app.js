@@ -271,3 +271,71 @@ function getFilteredList() {
     return matchQuery && matchStatus; 
   }); 
 } 
+
+/* EDIT — carga datos en el formulario */
+function startEdit(id) {
+  try {
+    const p = getPatientById(id);
+    if (!p) throw new Error("Paciente no encontrado: " + id);
+ 
+    editingId = id;
+    $("field-id").value       = p.id;
+    $("field-name").value     = p.name;
+    $("field-age").value      = p.age;
+    $("field-gender").value   = p.gender;
+    $("field-diagnosis").value= p.diagnosis;
+    $("field-phone").value    = p.phone || "";
+    $("field-status").value   = p.status;
+    $("field-notes").value    = p.notes || "";
+ 
+    $("form-heading").textContent    = "Editar Paciente";
+    $("form-subheading").textContent = `Editando ID: ${p.id}`;
+    $("btn-submit").textContent      = "Actualizar Paciente";
+    switchTab("register");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    showToast("❌ " + err.message, "error");
+    console.error("startEdit error:", err);
+  }
+}
+ 
+function resetForm() {
+  $("patient-form").reset();
+  $("field-id").value = "";
+  editingId = null;
+  $("form-heading").textContent    = "Registrar Paciente";
+  $("form-subheading").textContent = "Complete todos los campos obligatorios marcados con *";
+  $("btn-submit").textContent      = "Guardar Paciente";
+  clearAllErrors();
+  $("form-feedback").classList.add("hidden");
+}
+ 
+/* DELETE — confirmación modal */
+function requestDelete(id) {
+  try {
+    const p = getPatientById(id);
+    if (!p) throw new Error("Paciente no encontrado.");
+    deleteTargetId = id;
+    $("modal-msg").textContent = `¿Deseas eliminar a "${p.name}" (${p.id})?`;
+    $("modal-overlay").classList.remove("hidden");
+  } catch (err) {
+    showToast("❌ " + err.message, "error");
+  }
+}
+ 
+function confirmDelete() {
+  try {
+    if (!deleteTargetId) return;
+    const p = getPatientById(deleteTargetId);
+    patients = patients.filter(pt => pt.id !== deleteTargetId);
+    savePatients(patients);
+    renderTable();
+    triggerWorker();
+    showToast(`🗑 Paciente "${p?.name}" eliminado.`, "error");
+  } catch (err) {
+    showToast("❌ Error al eliminar: " + err.message, "error");
+  } finally {
+    deleteTargetId = null;
+    $("modal-overlay").classList.add("hidden");
+  }
+}
