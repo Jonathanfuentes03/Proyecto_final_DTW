@@ -280,3 +280,23 @@ textarea { resize: vertical; }
 }
 .form-feedback.success { background: #d4f7e7; color: #1a6640; border: 1px solid #52b788; }
 .form-feedback.error   { background: #fde8e8; color: #9b1c1c; border: 1px solid #e88080; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-body); font-weight: 600; font-size: 14px;
+  border: none; border-radius: var(--radius-sm); cursor: pointer;
+  padding: 10px 22px; transition: all .2s; text-decoration: none;
+}
+.btn-primary   { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #225a40; }
+.btn-secondary { background: var(--bg-deep); color: #fff; }
+.btn-secondary:hover { background: #2d4a3a; }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #a93226; }
+.btn-sm { font-size: 12px; padding: 6px 14px; }
+ 
+/* ── UTILITY ── */
+.hidden { display: none !important; }

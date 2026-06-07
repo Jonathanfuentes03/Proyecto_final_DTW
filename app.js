@@ -446,5 +446,113 @@ function renderAgeChart(ranges) {
   });
 }
 
+/* ───────────────────────────────────────────
+   9. GEOLOCALIZACIÓN + FETCH API (Open-Meteo)
+─────────────────────────────────────────── */
+$("btn-geo").addEventListener("click", getUserLocation);
+ 
+function getUserLocation() {
+  const geoBox = $("geo-info");
+  geoBox.innerHTML = `<p style="color:var(--text-muted);font-size:13px">📡 Obteniendo ubicación…</p>`;
+ 
+  if (!navigator.geolocation) {
+    geoBox.innerHTML = `<p style="color:var(--danger);font-size:13px">❌ Geolocalización no soportada por este navegador.</p>`;
+    return;
+  }
+ 
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+      try {
+        // Mostrar coordenadas básicas de inmediato
+        geoBox.innerHTML = `
+          <div class="geo-data">
+            <div class="geo-row"><strong>Latitud:</strong> ${lat.toFixed(5)}°</div>
+            <div class="geo-row"><strong>Longitud:</strong> ${lon.toFixed(5)}°</div>
+            <div class="geo-row"><strong>Precisión:</strong> ±${Math.round(accuracy)} m</div>
+            <div class="geo-row" id="geo-city"><strong>Ciudad:</strong> <em>cargando…</em></div>
+          </div>`;
+ 
+        // Fetch 1 — Geocodificación inversa con Nominatim
+        await fetchCityName(lat, lon);
+ 
+        // Fetch 2 — Clima con Open-Meteo
+        await fetchWeather(lat, lon);
+      } catch (err) {
+        console.error("Geo fetch error:", err);
+        showToast("⚠ No se pudo obtener datos adicionales de ubicación.", "info");
+      }
+    },
+    (err) => {
+      const msgs = {
+        1: "Permiso denegado por el usuario.",
+        2: "Posición no disponible.",
+        3: "Tiempo de espera agotado."
+      };
+      geoBox.innerHTML = `<p style="color:var(--danger);font-size:13px">❌ ${msgs[err.code] || err.message}</p>`;
+    },
+    { timeout: 12000, maximumAge: 60000 }
+  );
+}
+ 
+async function fetchCityName(lat, lon) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    const res  = await fetch(url, {
+      headers: { "Accept-Language": "es", "User-Agent": "MedRegister/1.0" }
+    });
+    if (!res.ok) throw new Error("Nominatim HTTP " + res.status);
+    const data = await res.json();  // Manejo de JSON
+ 
+    const city = data.address?.city || data.address?.town ||
+                 data.address?.village || data.address?.county || "Desconocida";
+    const country = data.address?.country || "";
+    const row = $("geo-city");
+    if (row) row.innerHTML = `<strong>Ciudad:</strong> ${escHtml(city)}, ${escHtml(country)}`;
+  } catch (err) {
+    const row = $("geo-city");
+    if (row) row.innerHTML = `<strong>Ciudad:</strong> No disponible`;
+    console.warn("fetchCityName error:", err);
+  }
+}
+ 
+async function fetchWeather(lat, lon) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+                `&current_weather=true&hourly=relative_humidity_2m` +
+                `&timezone=auto&forecast_days=1`;
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error("Open-Meteo HTTP " + res.status);
+    const data = await res.json();  // Manejo de JSON
+ 	
+    const cw   = data.current_weather;
+    const wmo  = {
+      0:"☀ Despejado", 1:"🌤 Mayormente despejado", 2:"⛅ Parcialmente nublado",
+      3:"☁ Nublado", 45:"🌫 Neblina", 48:"🌫 Escarcha", 51:"🌦 Llovizna ligera",
+      61:"🌧 Lluvia moderada", 63:"🌧 Lluvia fuerte", 80:"🌦 Chubascos",
+      95:"⛈ Tormenta"
+    };
+    const cond = wmo[cw.weathercode] || `Código ${cw.weathercode}`;
+    const humidity = data.hourly?.relative_humidity_2m?.[0] ?? "N/D";
+ 
+    const wb = $("weather-info");
+    wb.classList.remove("hidden");
+    wb.innerHTML = `
+      <strong style="font-size:14px;display:block;margin-bottom:8px">🌡 Clima actual</strong>
+      <div class="geo-data">
+        <div class="geo-row"><strong>Condición:</strong> ${escHtml(cond)}</div>
+        <div class="geo-row"><strong>Temperatura:</strong> ${cw.temperature}°C</div>
+        <div class="geo-row"><strong>Viento:</strong> ${cw.windspeed} km/h</div>
+        <div class="geo-row"><strong>Humedad:</strong> ${humidity}%</div>
+      </div>`;
+    showToast("📍 Ubicación y clima obtenidos con éxito.", "success");
+  } catch (err) {
+    console.warn("fetchWeather error:", err);
+    const wb = $("weather-info");
+    wb.classList.remove("hidden");
+    wb.innerHTML = `<p style="color:var(--text-muted);font-size:13px">⚠ Clima no disponible en este momento.</p>`;
+  }
+}
+
 
 
