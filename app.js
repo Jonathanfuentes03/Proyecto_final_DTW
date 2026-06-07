@@ -203,3 +203,71 @@ function savePatient(e) {
 function getPatientById(id) {
   return patients.find(p => p.id === id) || null;
 }
+
+/* ─────────────────────────────────────────── 
+   7. RENDER TABLE (Manipulación del DOM) 
+─────────────────────────────────────────── */ 
+function renderTable(list) { 
+  const data   = list || getFilteredList(); 
+  const tbody  = $("patients-tbody"); 
+  const empty  = $("empty-state"); 
+  const table  = document.querySelector(".patients-table"); 
+
+  tbody.innerHTML = ""; 
+
+  if (data.length === 0) { 
+    table.style.display  = "none"; 
+    empty.classList.remove("hidden"); 
+    return; 
+  } 
+
+  table.style.display = ""; 
+  empty.classList.add("hidden"); 
+  const fragment = document.createDocumentFragment(); 
+
+  data.forEach(p => { 
+    const tr = document.createElement("tr"); 
+    tr.innerHTML = ` 
+      <td><code style="font-size:11px;color:var(--text-muted)">${escHtml(p.id)}</code></td> 
+      <td><strong>${escHtml(p.name)}</strong></td> 
+      <td>${escHtml(String(p.age))}</td> 
+      <td>${escHtml(p.gender)}</td> 
+      <td>${escHtml(p.diagnosis)}</td> 
+      <td><span class="badge badge-${escHtml(p.status)}">${escHtml(p.status)}</span></td> 
+      <td>${escHtml(p.createdAt || "—")}</td> 
+      <td style="white-space:nowrap"> 
+        <button class="action-btn edit"   data-id="${escHtml(p.id)}">✏ Editar</button> 
+        <button class="action-btn delete" data-id="${escHtml(p.id)}" style="margin-left:6px">🗑 Eliminar</button> 
+      </td>`; 
+    fragment.appendChild(tr); 
+  }); 
+
+  tbody.appendChild(fragment); 
+  
+  // Eventos de tabla — delegados 
+  tbody.querySelectorAll(".action-btn.edit").forEach(btn => 
+    btn.addEventListener("click", () => startEdit(btn.dataset.id)) 
+  ); 
+  tbody.querySelectorAll(".action-btn.delete").forEach(btn => 
+    btn.addEventListener("click", () => requestDelete(btn.dataset.id)) 
+  ); 
+} 
+
+function escHtml(str) { 
+  return String(str) 
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;") 
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;"); 
+} 
+
+function getFilteredList() { 
+  const query  = $("search-input")?.value?.toLowerCase() || ""; 
+  const status = $("filter-status")?.value || ""; 
+  return patients.filter(p => { 
+    const matchQuery  = !query || 
+      p.name.toLowerCase().includes(query) || 
+      p.id.toLowerCase().includes(query) || 
+      p.diagnosis.toLowerCase().includes(query); 
+    const matchStatus = !status || p.status === status; 
+    return matchQuery && matchStatus; 
+  }); 
+} 
