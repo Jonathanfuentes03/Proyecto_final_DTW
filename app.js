@@ -96,3 +96,55 @@ function setFieldError(fieldId, msg) {
 function clearAllErrors() {
   ["name","age","gender","diagnosis","phone","status"].forEach(f => setFieldError(f, ""));
 }
+
+/* ───────────────────────────────────────────
+   5. VALIDACIONES (con Try/Catch)
+─────────────────────────────────────────── */
+function validateForm() {
+  clearAllErrors();
+  let valid = true;
+ 
+  try {
+    const name = $("field-name").value.trim();
+    if (!name || name.length < 2) {
+      setFieldError("name", "Nombre requerido (mínimo 2 caracteres).");
+      valid = false;
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/.test(name)) {
+      setFieldError("name", "Solo se permiten letras y espacios.");
+      valid = false;
+    }
+ 
+    const age = parseInt($("field-age").value);
+    if (isNaN(age) || age < 0 || age > 130) {
+      setFieldError("age", "Ingresa una edad válida (0–130).");
+      valid = false;
+    }
+ 
+    if (!$("field-gender").value) {
+      setFieldError("gender", "Selecciona un género.");
+      valid = false;
+    }
+ 
+    const diag = $("field-diagnosis").value.trim();
+    if (!diag || diag.length < 3) {
+      setFieldError("diagnosis", "Diagnóstico requerido (mínimo 3 caracteres).");
+      valid = false;
+    }
+ 
+    const phone = $("field-phone").value.trim();
+    if (phone && !/^[\d\s\+\-\(\)]{7,20}$/.test(phone)) {
+      setFieldError("phone", "Formato de teléfono no válido.");
+      valid = false;
+    }
+ 
+    if (!$("field-status").value) {
+      setFieldError("status", "Selecciona un estado.");
+      valid = false;
+    }
+  } catch (err) {
+    console.error("Error durante validación:", err);
+    valid = false;
+  }
+ 
+  return valid;
+}
