@@ -148,3 +148,58 @@ function validateForm() {
  
   return valid;
 }
+
+/* ───────────────────────────────────────────
+   6. CRUD — Crear / Editar / Eliminar / Listar
+─────────────────────────────────────────── */
+function generateId() {
+  return "PAC-" + Date.now().toString(36).toUpperCase() +
+    Math.random().toString(36).substring(2, 5).toUpperCase();
+}
+ 
+/* CREATE / UPDATE */
+function savePatient(e) {
+  e.preventDefault();
+  if (!validateForm()) return;
+ 
+  try {
+    const id = $("field-id").value || generateId();
+    const isNew = !$("field-id").value;
+ 
+    const patient = {
+      id,
+      name:      $("field-name").value.trim(),
+      age:       parseInt($("field-age").value),
+      gender:    $("field-gender").value,
+      diagnosis: $("field-diagnosis").value.trim(),
+      phone:     $("field-phone").value.trim(),
+      status:    $("field-status").value,
+      notes:     $("field-notes").value.trim(),
+      createdAt: isNew ? new Date().toLocaleDateString("es-CO") : (getPatientById(id)?.createdAt || ""),
+      updatedAt: new Date().toLocaleDateString("es-CO")
+    };
+ 
+    if (isNew) {
+      patients.unshift(patient);
+    } else {
+      const idx = patients.findIndex(p => p.id === id);
+      if (idx !== -1) patients[idx] = patient;
+    }
+ 
+    savePatients(patients);
+    resetForm();
+    renderTable();
+    triggerWorker();
+    showFeedback(isNew ? "✅ Paciente registrado exitosamente." : "✅ Paciente actualizado.", "success");
+    showToast(isNew ? `✅ Paciente "${patient.name}" registrado.` : `✅ Paciente "${patient.name}" actualizado.`, "success");
+    switchTab("patients");
+  } catch (err) {
+    showFeedback("❌ Error al guardar: " + err.message, "error");
+    console.error("savePatient error:", err);
+  }
+}
+ 
+/* READ */
+function getPatientById(id) {
+  return patients.find(p => p.id === id) || null;
+}
