@@ -9,6 +9,54 @@
 ═══════════════════════════════════════════════════════════════ */
  
 "use strict";
+/* ───────────────────────────────────────────
+   1. WEB WORKER — Se crea como Blob inline
+   para que funcione sin servidor HTTP
+─────────────────────────────────────────── */
+const WORKER_CODE = `
+  self.onmessage = function(e) {
+    const patients = e.data;
+
+    // Calcular métricas
+    const total    = patients.length;
+    const active   = patients.filter(p => p.status === "activo").length;
+    const inactive = patients.filter(p => p.status === "inactivo").length;
+    const critical = patients.filter(p => p.status === "crítico").length;
+
+    const avgAge = total > 0
+      ? Math.round(patients.reduce((s, p) => s + (parseInt(p.age) || 0), 0) / total)
+      : 0;
+
+    // Rangos de edad
+    const ranges = { "0-17": 0, "18-35": 0, "36-55": 0, "56-70": 0, "71+": 0 };
+    patients.forEach(p => {
+      const a = parseInt(p.age) || 0;
+      if (a <= 17)       ranges["0-17"]++;
+      else if (a <= 35)  ranges["18-35"]++;
+      else if (a <= 55)  ranges["36-55"]++;
+      else if (a <= 70)  ranges["56-70"]++;
+      else               ranges["71+"]++;
+    });
+
+    self.postMessage({ total, active, inactive, critical, avgAge, ranges,
+      timestamp: new Date().toISOString() });
+  };
+`;
+
+let metricsWorker = null;
+try {
+  const blob   = new Blob([WORKER_CODE], { type: "application/javascript" });
+  const blobUrl = URL.createObjectURL(blob);
+  metricsWorker = new Worker(blobUrl);
+  metricsWorker.onmessage = handleWorkerResult;
+  metricsWorker.onerror = (err) => {
+    console.error("Worker error:", err);
+    logWorker("❌ Error en Web Worker: " + err.message);
+  };
+} catch (err) {
+  console.error("No se pudo crear el Web Worker:", err);
+}
+
 /* ─────────────────────────────────────────── 
    2. STORAGE — LocalStorage + SessionStorage 
 ─────────────────────────────────────────── */ 
@@ -204,6 +252,74 @@ function getPatientById(id) {
   return patients.find(p => p.id === id) || null;
 }
 
+/* EDIT — carga datos en el formulario */
+function startEdit(id) {
+  try {
+    const p = getPatientById(id);
+    if (!p) throw new Error("Paciente no encontrado: " + id);
+ 
+    editingId = id;
+    $("field-id").value       = p.id;
+    $("field-name").value     = p.name;
+    $("field-age").value      = p.age;
+    $("field-gender").value   = p.gender;
+    $("field-diagnosis").value= p.diagnosis;
+    $("field-phone").value    = p.phone || "";
+    $("field-status").value   = p.status;
+    $("field-notes").value    = p.notes || "";
+ 
+    $("form-heading").textContent    = "Editar Paciente";
+    $("form-subheading").textContent = `Editando ID: ${p.id}`;
+    $("btn-submit").textContent      = "Actualizar Paciente";
+    switchTab("register");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    showToast("❌ " + err.message, "error");
+    console.error("startEdit error:", err);
+  }
+}
+ 
+function resetForm() {
+  $("patient-form").reset();
+  $("field-id").value = "";
+  editingId = null;
+  $("form-heading").textContent    = "Registrar Paciente";
+  $("form-subheading").textContent = "Complete todos los campos obligatorios marcados con *";
+  $("btn-submit").textContent      = "Guardar Paciente";
+  clearAllErrors();
+  $("form-feedback").classList.add("hidden");
+}
+ 
+/* DELETE — confirmación modal */
+function requestDelete(id) {
+  try {
+    const p = getPatientById(id);
+    if (!p) throw new Error("Paciente no encontrado.");
+    deleteTargetId = id;
+    $("modal-msg").textContent = `¿Deseas eliminar a "${p.name}" (${p.id})?`;
+    $("modal-overlay").classList.remove("hidden");
+  } catch (err) {
+    showToast("❌ " + err.message, "error");
+  }
+}
+ 
+function confirmDelete() {
+  try {
+    if (!deleteTargetId) return;
+    const p = getPatientById(deleteTargetId);
+    patients = patients.filter(pt => pt.id !== deleteTargetId);
+    savePatients(patients);
+    renderTable();
+    triggerWorker();
+    showToast(`🗑 Paciente "${p?.name}" eliminado.`, "error");
+  } catch (err) {
+    showToast("❌ Error al eliminar: " + err.message, "error");
+  } finally {
+    deleteTargetId = null;
+    $("modal-overlay").classList.add("hidden");
+  }
+}
+
 /* ─────────────────────────────────────────── 
    7. RENDER TABLE (Manipulación del DOM) 
 ─────────────────────────────────────────── */ 
@@ -272,70 +388,63 @@ function getFilteredList() {
   }); 
 } 
 
-/* EDIT — carga datos en el formulario */
-function startEdit(id) {
-  try {
-    const p = getPatientById(id);
-    if (!p) throw new Error("Paciente no encontrado: " + id);
- 
-    editingId = id;
-    $("field-id").value       = p.id;
-    $("field-name").value     = p.name;
-    $("field-age").value      = p.age;
-    $("field-gender").value   = p.gender;
-    $("field-diagnosis").value= p.diagnosis;
-    $("field-phone").value    = p.phone || "";
-    $("field-status").value   = p.status;
-    $("field-notes").value    = p.notes || "";
- 
-    $("form-heading").textContent    = "Editar Paciente";
-    $("form-subheading").textContent = `Editando ID: ${p.id}`;
-    $("btn-submit").textContent      = "Actualizar Paciente";
-    switchTab("register");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  } catch (err) {
-    showToast("❌ " + err.message, "error");
-    console.error("startEdit error:", err);
-  }
+/* ───────────────────────────────────────────
+   8. WEB WORKER — Envío y recepción
+─────────────────────────────────────────── */
+function triggerWorker() {
+  if (!metricsWorker) { updateKPIs({ total:0, active:0, inactive:0, critical:0, avgAge:0, ranges:{} }); return; }
+  logWorker("⏳ Procesando " + patients.length + " registro(s)…");
+  metricsWorker.postMessage(patients);
 }
  
-function resetForm() {
-  $("patient-form").reset();
-  $("field-id").value = "";
-  editingId = null;
-  $("form-heading").textContent    = "Registrar Paciente";
-  $("form-subheading").textContent = "Complete todos los campos obligatorios marcados con *";
-  $("btn-submit").textContent      = "Guardar Paciente";
-  clearAllErrors();
-  $("form-feedback").classList.add("hidden");
+function handleWorkerResult(e) {
+  const m = e.data;
+  logWorker(`✅ Cálculo completado a las ${new Date(m.timestamp).toLocaleTimeString("es-CO")}`);
+  logWorker(`   Total: ${m.total} | Activos: ${m.active} | Inactivos: ${m.inactive} | Críticos: ${m.critical} | Edad prom: ${m.avgAge}`);
+  updateKPIs(m);
 }
  
-/* DELETE — confirmación modal */
-function requestDelete(id) {
-  try {
-    const p = getPatientById(id);
-    if (!p) throw new Error("Paciente no encontrado.");
-    deleteTargetId = id;
-    $("modal-msg").textContent = `¿Deseas eliminar a "${p.name}" (${p.id})?`;
-    $("modal-overlay").classList.remove("hidden");
-  } catch (err) {
-    showToast("❌ " + err.message, "error");
-  }
+function logWorker(msg) {
+  const log = $("worker-log");
+  const idle = log.querySelector(".worker-idle");
+  if (idle) idle.remove();
+  const p = document.createElement("p");
+  p.textContent = "> " + msg;
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
 }
  
-function confirmDelete() {
-  try {
-    if (!deleteTargetId) return;
-    const p = getPatientById(deleteTargetId);
-    patients = patients.filter(pt => pt.id !== deleteTargetId);
-    savePatients(patients);
-    renderTable();
-    triggerWorker();
-    showToast(`🗑 Paciente "${p?.name}" eliminado.`, "error");
-  } catch (err) {
-    showToast("❌ Error al eliminar: " + err.message, "error");
-  } finally {
-    deleteTargetId = null;
-    $("modal-overlay").classList.add("hidden");
-  }
+function updateKPIs(m) {
+  $("kpi-total").textContent    = m.total;
+  $("kpi-active").textContent   = m.active;
+  $("kpi-inactive").textContent = m.inactive;
+  $("kpi-critical").textContent = m.critical;
+  $("kpi-avg-age").textContent  = m.avgAge || "—";
+ 
+  const pct = (v) => m.total > 0 ? Math.round(v / m.total * 100) : 0;
+  $("bar-active").style.width   = pct(m.active)   + "%";
+  $("bar-inactive").style.width = pct(m.inactive) + "%";
+  $("bar-critical").style.width = pct(m.critical) + "%";
+ 
+  renderAgeChart(m.ranges || {});
 }
+ 
+function renderAgeChart(ranges) {
+  const container = $("age-chart");
+  container.innerHTML = "";
+  const max = Math.max(...Object.values(ranges), 1);
+ 
+  Object.entries(ranges).forEach(([label, count]) => {
+    const pct = Math.round((count / max) * 100);
+    const wrap = document.createElement("div");
+    wrap.className = "age-bar-wrap";
+    wrap.innerHTML = `
+      <div class="age-bar-count">${count}</div>
+      <div class="age-bar-fill" style="height:${pct}%"></div>
+      <div class="age-bar-label">${label}</div>`;
+    container.appendChild(wrap);
+  });
+}
+
+
+
