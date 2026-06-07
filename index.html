@@ -225,6 +225,22 @@
       </div>
     </section>
 
+<!-- MODAL CONFIRM DELETE -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>¿Eliminar paciente?</h2>
+      <p id="modal-msg">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="btn-confirm-delete">Sí, eliminar</button>
+        <button class="btn btn-ghost" id="btn-cancel-delete">Cancelar</button>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"></div>
+
+
   </main>
  
   <script src="app.js"></script>

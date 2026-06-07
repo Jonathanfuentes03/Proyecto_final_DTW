@@ -300,3 +300,50 @@ textarea { resize: vertical; }
  
 /* ── UTILITY ── */
 .hidden { display: none !important; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(26,46,37,.55); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg-card); border-radius: var(--radius);
+  padding: 36px 40px; max-width: 400px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  animation: fadeUp .25s ease;
+}
+.modal h2 { font-family: var(--font-display); font-size: 26px; margin-bottom: 10px; }
+.modal p  { color: var(--text-muted); margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 12px; }
+ 
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 300;
+  background: var(--bg-deep); color: #fff;
+  padding: 13px 22px; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  animation: slideIn .25s ease;
+  max-width: 340px;
+}
+.toast.hidden { display: none; }
+.toast.toast-success { border-left: 4px solid var(--accent-light); }
+.toast.toast-error   { border-left: 4px solid var(--danger); }
+.toast.toast-info    { border-left: 4px solid var(--accent-alt); }
+ 
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+ 
+@media (max-width: 620px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-card { padding: 24px 18px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .patients-table th:nth-child(4),
+  .patients-table td:nth-child(4),
+  .patients-table th:nth-child(7),
+  .patients-table td:nth-child(7) { display: none; }
+}

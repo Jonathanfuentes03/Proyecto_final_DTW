@@ -554,5 +554,99 @@ async function fetchWeather(lat, lon) {
   }
 }
 
+/* ───────────────────────────────────────────
+   10. NAVEGACIÓN ENTRE TABS
+─────────────────────────────────────────── */
+function switchTab(tabName) {
+  $$(".tab-content").forEach(s => s.classList.remove("active"));
+  $$(".nav-btn").forEach(b => b.classList.remove("active"));
+ 
+  const section = $("tab-" + tabName);
+  const btn     = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
+  if (section) section.classList.add("active");
+  if (btn)     btn.classList.add("active");
+ 
+  if (tabName === "dashboard") triggerWorker();
+  if (tabName === "patients")  renderTable();
+}
+ 
+$$(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+ 
+/* Botón "Registrar primer paciente" en empty-state */
+document.addEventListener("click", e => {
+  const tab = e.target.dataset?.tab;
+  if (tab) switchTab(tab);
+});
+ 
+/* ───────────────────────────────────────────
+   11. EVENTOS DE FORMULARIO Y MODAL
+─────────────────────────────────────────── */
+$("patient-form").addEventListener("submit", savePatient);
+ 
+$("btn-cancel-form").addEventListener("click", () => {
+  resetForm();
+  switchTab("patients");
+});
+ 
+$("btn-confirm-delete").addEventListener("click", confirmDelete);
+$("btn-cancel-delete").addEventListener("click", () => {
+  deleteTargetId = null;
+  $("modal-overlay").classList.add("hidden");
+});
+ 
+$("modal-overlay").addEventListener("click", e => {
+  if (e.target === $("modal-overlay")) {
+    deleteTargetId = null;
+    $("modal-overlay").classList.add("hidden");
+  }
+});
+ 
+/* Filtros en tabla */
+$("search-input").addEventListener("input", () => renderTable());
+$("filter-status").addEventListener("change", () => renderTable());
+ 
+/* Recalcular manualmente */
+$("btn-recalc").addEventListener("click", () => {
+  logWorker("🔄 Recálculo manual solicitado…");
+  triggerWorker();
+  showToast("🔄 Recalculando métricas…", "info");
+});
+ 
+/* ───────────────────────────────────────────
+   12. DATOS DE MUESTRA (si no hay registros)
+─────────────────────────────────────────── */
+function seedSampleData() {
+  if (patients.length > 0) return;
+  const sample = [
+    { id: generateId(), name: "María García López",     age: 45, gender: "Femenino",  diagnosis: "Diabetes tipo 2",       phone: "+57 310 234 5678", status: "activo",   notes: "Controles cada 3 meses.",          createdAt: "01/01/2025", updatedAt: "01/01/2025" },
+    { id: generateId(), name: "Carlos Rodríguez Peña",  age: 62, gender: "Masculino", diagnosis: "Hipertensión arterial",  phone: "+57 315 876 5432", status: "activo",   notes: "Medicación Enalapril 10mg.",       createdAt: "05/01/2025", updatedAt: "05/01/2025" },
+    { id: generateId(), name: "Ana Martínez Vega",      age: 28, gender: "Femenino",  diagnosis: "Ansiedad generalizada", phone: "",                 status: "inactivo", notes: "Alta temporal.",                   createdAt: "10/02/2025", updatedAt: "10/02/2025" },
+    { id: generateId(), name: "Luis Hernández Torres",  age: 77, gender: "Masculino", diagnosis: "Insuficiencia cardiaca",phone: "+57 320 111 2233", status: "crítico",  notes: "Monitoreo continuo requerido.",    createdAt: "15/02/2025", updatedAt: "01/03/2025" },
+    { id: generateId(), name: "Sofía Morales Ruiz",     age: 14, gender: "Femenino",  diagnosis: "Asma bronquial",        phone: "+57 312 909 8765", status: "activo",   notes: "Inhalador de rescate siempre.",   createdAt: "20/03/2025", updatedAt: "20/03/2025" },
+    { id: generateId(), name: "Jorge Ramírez Cruz",     age: 53, gender: "Masculino", diagnosis: "Artritis reumatoide",   phone: "+57 316 543 2109", status: "inactivo", notes: "En remisión desde enero.",         createdAt: "01/04/2025", updatedAt: "01/04/2025" },
+    { id: generateId(), name: "Patricia Díaz Medina",   age: 38, gender: "Femenino",  diagnosis: "Migraña crónica",       phone: "+57 314 678 9012", status: "activo",   notes: "Profilaxis con Topiramato.",       createdAt: "12/04/2025", updatedAt: "12/04/2025" },
+    { id: generateId(), name: "Roberto Sánchez Blanco", age: 88, gender: "Masculino", diagnosis: "Parkinson estadio III", phone: "+57 318 234 5670", status: "crítico",  notes: "Fisioterapia diaria. Acompañante.", createdAt: "20/04/2025", updatedAt: "20/04/2025" },
+  ];
+  patients = sample;
+  savePatients(patients);
+}
+ 
+/* ───────────────────────────────────────────
+   13. INICIALIZACIÓN
+─────────────────────────────────────────── */
+(function init() {
+  try {
+    initSession();
+    seedSampleData();
+    renderTable();
+    triggerWorker();
+    switchTab("dashboard");
+  } catch (err) {
+    console.error("Error en inicialización:", err);
+    showToast("❌ Error al iniciar la aplicación.", "error");
+  }
+})();
 
 
