@@ -139,6 +139,92 @@
         </div>
       </div>
     </section>
+    
+    <!-- ════════════════════════════════
+         TAB: REGISTER / EDIT FORM
+    ════════════════════════════════ -->
+    <section id="tab-register" class="tab-content">
+      <div class="page-title">
+        <h1 id="form-heading">Registrar Paciente</h1>
+      </div>
+ 
+      <div class="form-card">
+        <form id="patient-form" novalidate>
+          <input type="hidden" id="field-id" />
+ 
+          <div class="form-grid">
+            <!-- Nombre -->
+            <div class="form-group">
+              <label for="field-name">Nombre completo *</label>
+              <input type="text" id="field-name" placeholder="Ej. Juan Pérez García" autocomplete="off"/>
+              <span class="field-error" id="err-name"></span>
+            </div>
+ 
+            <!-- Edad -->
+            <div class="form-group">
+              <label for="field-age">Edad *</label>
+              <input type="number" id="field-age" placeholder="Ej. 35" min="0" max="130"/>
+              <span class="field-error" id="err-age"></span>
+            </div>
+ 
+            <!-- Género -->
+            <div class="form-group">
+              <label for="field-gender">Género *</label>
+              <select id="field-gender">
+                <option value="">Seleccionar…</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+              <span class="field-error" id="err-gender"></span>
+            </div>
+ 
+            <!-- Diagnóstico -->
+            <div class="form-group">
+              <label for="field-diagnosis">Diagnóstico *</label>
+              <input type="text" id="field-diagnosis" placeholder="Ej. Hipertensión arterial"/>
+              <span class="field-error" id="err-diagnosis"></span>
+            </div>
+ 
+            <!-- Teléfono -->
+            <div class="form-group">
+              <label for="field-phone">Teléfono</label>
+              <input type="tel" id="field-phone" placeholder="Ej. +503 7123 4567"/>
+              <span class="field-error" id="err-phone"></span>
+            </div>
+ 
+            <!-- Estado -->
+            <div class="form-group">
+              <label for="field-status">Estado *</label>
+              <select id="field-status">
+                <option value="">Seleccionar…</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="crítico">Crítico</option>
+              </select>
+              <span class="field-error" id="err-status"></span>
+            </div>
+ 
+            <!-- Aviso de campos obligatorios -->
+            <div class="form-group form-group-full">
+              <p id="form-subheading" class="fields-notice">Complete todos los campos obligatorios marcados con *</p>
+            </div>
+ 
+            <!-- Notas -->
+            <div class="form-group form-group-full">
+              <label for="field-notes">Notas clínicas</label>
+              <textarea id="field-notes" rows="3" placeholder="Observaciones adicionales…"></textarea>
+            </div>
+          </div>
+ 
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-submit">Guardar Paciente</button>
+            <button type="button" class="btn btn-ghost" id="btn-cancel-form">Cancelar</button>
+          </div>
+ 
+          <div id="form-feedback" class="form-feedback hidden"></div>
+        </form>
+      </div>
+    </section>
 
   </main>
  

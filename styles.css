@@ -230,3 +230,53 @@ body {
 }
 .empty-state span { font-size: 48px; display: block; margin-bottom: 12px; }
 .empty-state p { margin-bottom: 20px; }
+
+.fields-notice {
+  font-size: 12px;                          /* ← letra pequeña        */
+  color: var(--text-muted);                 /* ← color gris           */
+  background: #f0f4f0;                      /* ← fondo verde muy claro*/
+  border-left: 3px solid var(--accent-light);/* ← línea verde izquierda*/
+  border-radius: 0 6px 6px 0;              /* ← esquinas redondeadas  */
+  padding: 9px 14px;                        /* ← espacio interno       */
+  margin: 4px 0;                            /* ← separación vertical   */
+}
+
+/* ── FORM ── */
+.form-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 36px 40px; box-shadow: var(--shadow);
+  max-width: 800px;
+}
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group-full { grid-column: 1 / -1; }
+.form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
+ 
+.form-group input,
+.form-group select,
+.form-group textarea {
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg); font-family: var(--font-body); font-size: 14px;
+  color: var(--text); padding: 10px 14px; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(45,106,79,.12);
+}
+.form-group input.input-error { border-color: var(--danger); }
+textarea { resize: vertical; }
+ 
+.field-error { font-size: 12px; color: var(--danger); min-height: 16px; }
+ 
+.form-actions { display: flex; gap: 12px; margin-top: 28px; }
+.form-feedback {
+  margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500;
+}
+.form-feedback.success { background: #d4f7e7; color: #1a6640; border: 1px solid #52b788; }
+.form-feedback.error   { background: #fde8e8; color: #9b1c1c; border: 1px solid #e88080; }
