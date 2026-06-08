@@ -347,3 +347,80 @@ textarea { resize: vertical; }
   .patients-table th:nth-child(7),
   .patients-table td:nth-child(7) { display: none; }
 }
+
+/* ===== Vista responsiva para moviles ===== */
+.main{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px;
+}
+
+@media (max-width: 768px){
+  .header{
+    height:auto;
+  }
+
+  .header-inner{
+    flex-direction:column;
+    align-items:stretch;
+    gap:12px;
+    padding:12px;
+  }
+
+  .logo{
+    white-space:normal;
+    text-align:center;
+    justify-content:center;
+    font-size:14px;
+  }
+
+  .nav-tabs{
+    width:100%;
+    overflow-x:auto;
+    justify-content:flex-start;
+  }
+
+  .nav-btn{
+    flex:1;
+    min-width:110px;
+  }
+
+  .page-title{
+    flex-direction:column;
+  }
+
+  .list-controls{
+    width:100%;
+    flex-direction:column;
+  }
+
+  .search-input,
+  .filter-select{
+    width:100%;
+    min-width:unset;
+  }
+
+  .table-wrap{
+    overflow-x:auto;
+  }
+
+  .patients-table{
+    min-width:700px;
+  }
+
+  .form-actions{
+    flex-direction:column;
+  }
+
+  .form-actions .btn{
+    width:100%;
+    justify-content:center;
+  }
+
+  .toast{
+    left:12px;
+    right:12px;
+    bottom:12px;
+    max-width:none;
+  }
+}
