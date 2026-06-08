@@ -238,8 +238,8 @@ function savePatient(e) {
     resetForm();
     renderTable();
     triggerWorker();
-    showFeedback(isNew ? "✅ Paciente registrado exitosamente." : "✅ Paciente actualizado.", "success");
-    showToast(isNew ? `✅ Paciente "${patient.name}" registrado.` : `✅ Paciente "${patient.name}" actualizado.`, "success");
+    showFeedback(isNew ? "Paciente registrado exitosamente." : "Paciente actualizado.", "success");
+    showToast(isNew ? `Paciente "${patient.name}" registrado.` : `Paciente "${patient.name}" actualizado.`, "success");
     switchTab("patients");
   } catch (err) {
     showFeedback("❌ Error al guardar: " + err.message, "error");
@@ -299,7 +299,7 @@ function requestDelete(id) {
     $("modal-msg").textContent = `¿Deseas eliminar a "${p.name}" (${p.id})?`;
     $("modal-overlay").classList.remove("hidden");
   } catch (err) {
-    showToast("❌ " + err.message, "error");
+    showToast(err.message, "error");
   }
 }
  
@@ -313,7 +313,7 @@ function confirmDelete() {
     triggerWorker();
     showToast(`🗑 Paciente "${p?.name}" eliminado.`, "error");
   } catch (err) {
-    showToast("❌ Error al eliminar: " + err.message, "error");
+    showToast("Error al eliminar: " + err.message, "error");
   } finally {
     deleteTargetId = null;
     $("modal-overlay").classList.add("hidden");
@@ -399,7 +399,7 @@ function triggerWorker() {
  
 function handleWorkerResult(e) {
   const m = e.data;
-  logWorker(`✅ Cálculo completado a las ${new Date(m.timestamp).toLocaleTimeString("es-CO")}`);
+  logWorker(`Cálculo completado a las ${new Date(m.timestamp).toLocaleTimeString("es-CO")}`);
   logWorker(`   Total: ${m.total} | Activos: ${m.active} | Inactivos: ${m.inactive} | Críticos: ${m.critical} | Edad prom: ${m.avgAge}`);
   updateKPIs(m);
 }
